@@ -1,0 +1,79 @@
+// Node Object to hold a data items in a binary tree
+// Programmer:  Jonathan Godley - c3188072
+// Course: SENG1120
+// Last modified:  4/11/2017
+
+// CONSTRUCTOR
+// inits data item and sets next and previous to null
+template <typename value_type>
+Node<value_type>::Node(value_type* init_data, Node<value_type>* parent_link)
+{
+  data = init_data;
+  parent = parent_link;
+  bLeft = NULL;
+  bRight = NULL;
+}
+
+// DESTRUCTOR
+// set pointers to null, delete student object
+template <typename value_type>
+Node<value_type>::~Node()
+{
+  delete data;
+  delete bLeft;
+  delete bRight;
+  data = NULL;
+  parent = NULL;
+  bLeft = NULL;
+  bRight = NULL;
+}
+
+// MEMBER FUNCTIONS
+// set data to a new value
+template <typename value_type>
+void Node<value_type>::set_data(const value_type& new_data)
+{
+  data = new_data;
+}
+
+// set parent pointer to a new Node
+template <typename value_type>
+void Node<value_type>::set_parent(Node* parent_link)
+{
+  parent = parent_link;
+}
+
+// set bLeft pointer to a new Node
+template <typename value_type>
+void Node<value_type>::set_bLeft(Node* bLeft_link)
+{
+  bLeft = bLeft_link;
+}
+
+// set bRight pointer to a new Node
+template <typename value_type>
+void Node<value_type>::set_bRight(Node* bRight_link)
+{
+  bRight = bRight_link;
+}
+
+// return parent Node
+template <typename value_type>
+Node<value_type>* Node<value_type>::get_parent() const
+{
+  return parent;
+}
+
+// return bLeft Node
+template <typename value_type>
+Node<value_type>* Node<value_type>::get_bLeft() const
+{
+  return bLeft;
+}
+
+// return bRight Node
+template <typename value_type>
+Node<value_type>* Node<value_type>::get_bRight() const
+{
+  return bRight;
+}

@@ -1,0 +1,291 @@
+// This is the class implementation for a linked list object
+// that can consist of multiple nodes
+// Programmer:  Jonathan Godley - c3188072
+// Course: SENG1120
+// Last modified:  27/09/17
+
+//CONSTRUCTORS
+//create an empty linked list
+template <typename value_type>
+BinaryTree<value_type>::BinaryTree()
+{
+								head_ptr_ = NULL;
+								tail_ptr_ = NULL;
+								current_ptr_ = NULL;
+								list_length=0;
+}
+
+//create a linked list with data
+template <typename value_type>
+BinaryTree<value_type>::BinaryTree(const value_type& data)
+{
+								head_ptr_ = new node<value_type>(data);
+								tail_ptr_ = head_ptr_;
+								current_ptr_ = tail_ptr_;
+								list_length=1;
+}
+
+//DESTRUCTOR
+//ensure all nodes are removed from the heap when a linked list is deleted
+template <typename value_type>
+BinaryTree<value_type>::~BinaryTree()
+{
+								while(list_length!=0)
+								{
+																move_to_head();
+																remove_current();
+								}
+}
+
+// MEMBER FUNCTIONS
+template <typename value_type>
+void BinaryTree<value_type>::add(string data)
+{
+								// takes a string as a parameter and appends it
+								//   to the BinaryTree, one word in each node.
+								int i; //index
+								string tmpstring; //temp string
+								while (data.length() > 0)
+								{
+																//find the index of the first space
+																if (data.find(" ") != string::npos)
+																{
+																								i = data.find(" ");
+
+																								//make a substring at that index
+																								tmpstring = data.substr(0,i);
+
+																								if (tmpstring!="")
+																								{
+																																//convert the substring into our typedef value_type
+																																istringstream buffer(tmpstring);
+																																value_type tmpvalue;
+																																buffer >> tmpvalue;
+																																// add our typedef converted value to the linked list
+																																add_to_tail(tmpvalue);
+																								}
+
+																								//adjust the word, so that it no longer contains the first substring
+																								data = data.substr((i+1), string::npos);
+																}
+																else // gotta treat final word differently, no remaining whitespace
+																{
+																								i = data.length();
+
+																								//make a substring at that index
+																								tmpstring = data.substr(0,i);
+
+																								if (tmpstring!="")
+																								{
+																																//convert the substring into our typedef value_type
+																																istringstream buffer(tmpstring);
+																																value_type tmpvalue;
+																																buffer >> tmpvalue;
+																																// add our typedef converted value to the linked list
+																																add_to_tail(tmpvalue);
+																								}
+
+																								//adjust the word, so that it no longer contains the first substring
+																								data = data.substr((i), string::npos);
+																}
+								}
+}
+
+template <typename value_type>
+void BinaryTree<value_type>::remove_current()
+{
+								// do nothing for empty list
+								if (list_length==0)
+																return;
+
+								// remove final node if only 1 node in list
+								else if(list_length==1)
+								{
+																delete head_ptr_;
+																head_ptr_=NULL;
+																tail_ptr_=NULL;
+																current_ptr_ = NULL;
+																list_length--;
+																return;
+								}
+								else if (current_ptr_!=head_ptr_ && current_ptr_!=tail_ptr_)
+								{
+
+																// make a temp_current_ptr and set it as the current current_ptr_
+																node<value_type>* temp_current_ptr = current_ptr_;
+
+																// rearrange the appropriate ptrs for the list
+																current_ptr_ = temp_current_ptr->get_previous();
+																current_ptr_->set_next(temp_current_ptr->get_next());
+																current_ptr_ = temp_current_ptr->get_next();
+																current_ptr_->set_previous(temp_current_ptr->get_previous());
+
+																// remove the node, memory management
+																delete temp_current_ptr;
+																// decrement list
+																list_length--;
+																// set to ptr to null
+																temp_current_ptr = NULL;
+
+								}
+								// ensure that we don't select out of bounds, if trying to delete the head,
+								// delete from head
+								else if (current_ptr_==head_ptr_)
+								{
+																// make a temp_head_ptr and set it as the current head_ptr_
+																node<value_type>* temp_head_ptr = head_ptr_;
+																// rearrange the head_ptr_ for the list
+																head_ptr_ = temp_head_ptr->get_next();
+																// remove the node, memory management
+																delete temp_head_ptr;
+																// decrement list
+																list_length--;
+																// set to ptr to null
+																temp_head_ptr = NULL;
+																move_to_head();
+								}
+								// ensure that we don't select out of bounds, if trying to delete the tail,
+								// delete from tail
+								else if (current_ptr_==tail_ptr_)
+								{
+																// make a temp_tail_ptr and set it as the current tail_ptr_
+																node<value_type>* temp_tail_ptr = tail_ptr_;
+																// rearrange the tail_ptr_ for the list
+																tail_ptr_ = temp_tail_ptr->get_previous();
+																// remove the node, memory management
+																delete temp_tail_ptr;
+																// decrement list
+																list_length--;
+																// set to ptr to null
+																temp_tail_ptr = NULL;
+																move_to_tail();
+								}
+}
+
+template <typename value_type>
+void BinaryTree<value_type>::forward()
+{
+								// boundary to prevent selecting outside of list
+								if (current_ptr_!=tail_ptr_)
+								{
+																current_ptr_ = current_ptr_->get_next();
+								}
+								else
+								{
+																return;
+								}
+}
+
+template <typename value_type>
+void BinaryTree<value_type>::backwards()
+{
+								// boundary to prevent selecting outside of list
+								if (current_ptr_!=head_ptr_)
+								{
+																current_ptr_ = current_ptr_->get_previous();
+								}
+								else
+								{
+																return;
+								}
+}
+
+template <typename value_type>
+void BinaryTree<value_type>::move_to_head()
+{
+								current_ptr_ = head_ptr_;
+}
+
+
+template <typename value_type>
+value_type BinaryTree<value_type>::get_current() const
+{
+								return current_ptr_->get_data();
+}
+
+template <typename value_type>
+int BinaryTree<value_type>::length() const
+{
+								return list_length;
+}
+
+template <typename value_type>
+int BinaryTree<value_type>::count(value_type data)
+{
+								int i = 0; // index
+								int count = 0; // our recorded number of occurences
+								move_to_head(); // put us back at the top of the list
+								while (i < list_length)
+								{
+																if (current_ptr_->get_data() == data) // note: Case Sensitive when dealing with strings
+																{
+																								count++;
+																}
+																i++;
+																forward();
+								}
+								return count;
+}
+
+template <typename value_type>
+void BinaryTree<value_type>::remove(value_type data)  // note: case sensitive when dealing with strings
+{
+								int i = 0; // index
+								move_to_head(); // put us back at the top of the list
+								while (i < list_length)
+								{
+																if (current_ptr_->get_data() == data)
+																{
+																								remove_current();
+																								move_to_head(); // move us back to the head of the list and start searching
+																								i=0; // from the beginning because we've changed list layout.
+																}
+																else
+																{
+																								forward();
+																								i++;
+																}
+								}
+}
+
+// OVERLOADED OPERATORS
+template <typename value_type>
+ostream& operator <<(ostream& out, BinaryTree<value_type>& data)
+{
+								if (data.length()!=0)
+								{
+																int i = 0; // index
+																data.move_to_head(); // put us back at the top of the list
+																while (i < data.length())
+																{
+																								out << data.get_current() << " "; // pull the contents of the list into a single string
+																								i++;
+																								data.forward();
+																}
+								}
+								return out;
+}
+
+template <typename value_type>
+void operator>>( string& input, BinaryTree<value_type>& list )
+{
+								// makes use of the function add(string).
+								list.add(input);
+}
+
+template <typename value_type>
+void operator +=(BinaryTree<value_type>& llLeft, BinaryTree<value_type>& llRight)
+{
+								if (llRight.length() != 0)
+								{
+																int i = 0; // index
+																llRight.move_to_head(); // put us back at the top of the list
+																while (i < llRight.length())
+																{
+																								llLeft.add(llRight.get_current()); // add each piece of data from the right linked list into the left linked list
+																								i++;
+																								llRight.forward();
+																}
+
+								}
+}
